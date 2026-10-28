@@ -507,6 +507,12 @@ ol {
   width: calc(var(--u) * 467);
   animation: fade 0.8s both;
 }
+.heat-haze svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
 .home-question {
   left: calc(var(--u) * 395);
   top: calc(var(--u) * 276);

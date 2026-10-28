@@ -1,3 +1,4 @@
+import HeatHaze from '../components/HeatHaze'
 import Layout from '../components/Layout'
 import { EXHIBITION } from '../data/exhibition'
 
@@ -5,7 +6,7 @@ export default function Home() {
   return (
     <Layout className="page-home" footer={false}>
       <section className="stage home-stage">
-        <img className="home-temp" src="/assets/home-temp.png" alt="36.5°C" />
+        <HeatHaze className="home-temp" src="/assets/home-temp.png" alt="36.5°C" width={934} height={314} />
         <h1 className="home-question">
           What temperature do you personally live your life (<span className="blank" />
           °C)?
