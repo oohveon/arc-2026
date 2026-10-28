@@ -261,26 +261,44 @@ ol {
   left: calc(var(--u) * 181);
   top: calc(var(--u) * 332);
   width: calc(var(--u) * 281);
-  animation: fade 1s 0.6s both;
+  height: calc(var(--u) * 254);
+}
+.intro-walkers > img {
+  position: absolute;
+  left: 0;
+  top: calc(var(--u) * 1);
+  width: calc(var(--u) * 280);
+}
+.walker-box {
+  position: absolute;
+  left: calc(var(--u) * var(--x));
+  top: calc(var(--u) * var(--y));
+  width: calc(var(--u) * 62);
+  height: calc(var(--u) * 55);
+  outline: 1px solid rgba(214, 80, 81, 0.6);
+  outline-offset: -1px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.walker-box img {
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.35s 0.1s;
+}
+.walker-box.is-on,
+.walker-box.is-on img {
+  opacity: 1;
 }
 .intro-figure {
   left: calc(var(--u) * 854);
   top: calc(var(--u) * 143);
-  width: calc(var(--u) * 211);
-  overflow: hidden;
+  width: calc(var(--u) * 211.3);
 }
-.intro-figure img {
+.intro-figure canvas {
+  display: block;
   width: 100%;
-  animation: reveal 2.2s steps(22) both;
-}
-.intro-figure .scan {
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: var(--red);
-  opacity: 0;
-  animation: scan 2.2s linear both;
+  aspect-ratio: 211.3 / 821.2;
 }
 .intro-corner {
   width: calc(var(--u) * 14);
@@ -310,12 +328,13 @@ ol {
 .intro-callout {
   left: calc(var(--u) * var(--x));
   top: calc(var(--u) * var(--y));
-  animation: fade 0.6s calc(1.2s + var(--i) * 0.2s) both;
 }
 .intro-callout-label {
   display: block;
+  min-height: 1.2em;
   margin-left: calc(var(--u) * var(--lx));
   margin-bottom: calc(var(--u) * 2);
+  font-variant-numeric: tabular-nums;
   font-size: max(9px, calc(var(--u) * 14));
   color: #6a6666;
   white-space: nowrap;
@@ -354,7 +373,39 @@ ol {
   height: calc(var(--u) * 8);
   background: var(--red);
   transform: translateX(-50%);
-  animation: blink 1.4s 2s infinite;
+}
+.intro.is-probing,
+.intro.is-probing a {
+  cursor: none;
+}
+.cursor-probe {
+  --w: 66;
+  --h: 60;
+  --lx: 0;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 50;
+  pointer-events: none;
+  animation: fade 0.3s both;
+}
+.cursor-probe .intro-callout-box {
+  position: absolute;
+  left: calc(var(--u) * -33);
+  top: calc(var(--u) * -30);
+  border-color: rgba(214, 80, 81, 0.8);
+}
+.cursor-probe .intro-callout-label {
+  position: absolute;
+  left: calc(var(--u) * -33);
+  bottom: calc(var(--u) * 32);
+  margin: 0;
+  color: var(--red);
+}
+.scramble {
+  display: inline-block;
+  filter: blur(0.6px);
+  opacity: 0.75;
 }
 .intro-scale {
   left: calc(var(--u) * 1220);
@@ -363,8 +414,7 @@ ol {
 }
 .intro-scale li {
   height: calc(var(--u) * 52.6);
-  transform-origin: left;
-  animation: grow 0.5s calc(0.4s + var(--i) * 0.07s) both;
+  transition: background-color 0.12s;
 }
 .intro-scale-label {
   left: calc(var(--u) * 1272);
@@ -372,7 +422,11 @@ ol {
   padding-left: calc(var(--u) * 22);
   font-size: max(9px, calc(var(--u) * 14));
   color: #6a6666;
-  animation: fade 0.6s 1.2s both;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.intro-scale-label.is-on {
+  opacity: 1;
 }
 .intro-scale-label::before {
   content: '';
@@ -395,10 +449,20 @@ ol {
 }
 .intro-bars {
   left: calc(var(--u) * 1683);
-  top: calc(var(--u) * 818);
-  width: calc(var(--u) * 156);
-  transform-origin: bottom;
-  animation: rise 1s 1s both;
+  top: calc(var(--u) * 808);
+  height: calc(var(--u) * 160);
+  display: flex;
+  align-items: flex-end;
+  gap: calc(var(--u) * 7);
+}
+.intro-bars span {
+  width: calc(var(--u) * 16.5);
+  background: #e8e8e8;
+  outline: 0.5px solid var(--red);
+  outline-offset: -0.5px;
+}
+.intro-copy .typed-rest {
+  visibility: hidden;
 }
 .intro-copy {
   left: calc(var(--u) * 80);
@@ -426,7 +490,11 @@ ol {
   font-size: 13px;
   letter-spacing: 0.1em;
   color: #9a9a9a;
-  animation: blink 1.6s 2.4s infinite both;
+  opacity: 0;
+}
+.intro-hint.is-on {
+  opacity: 1;
+  animation: blink 1.6s infinite both;
 }
 
 /* ---------- Home ---------- */
@@ -965,37 +1033,6 @@ ol {
   from {
     opacity: 0;
     transform: translateY(12px);
-  }
-}
-@keyframes reveal {
-  from {
-    clip-path: inset(0 0 100% 0);
-  }
-  to {
-    clip-path: inset(0 0 0 0);
-  }
-}
-@keyframes scan {
-  0% {
-    top: 0;
-    opacity: 1;
-  }
-  95% {
-    opacity: 1;
-  }
-  100% {
-    top: 100%;
-    opacity: 0;
-  }
-}
-@keyframes grow {
-  from {
-    transform: scaleX(0);
-  }
-}
-@keyframes rise {
-  from {
-    transform: scaleY(0);
   }
 }
 @keyframes blink {
