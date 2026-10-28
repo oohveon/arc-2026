@@ -1,7 +1,7 @@
-import Layout from '../components/Layout.jsx'
-import { EXHIBITION, TEAM } from '../data/exhibition.js'
+import Layout from '../components/Layout'
+import { EXHIBITION, TEAM, type TeamGroup as TeamGroupData } from '../data/exhibition'
 
-function SectionHead({ title, no }) {
+function SectionHead({ title, no }: { title: string; no: string }) {
   return (
     <header className="about-head">
       <h2>{title}</h2>
@@ -10,7 +10,7 @@ function SectionHead({ title, no }) {
   )
 }
 
-function TeamGroup({ group }) {
+function TeamGroup({ group }: { group: TeamGroupData }) {
   return (
     <div className="team-group">
       <h3>{group.name}</h3>

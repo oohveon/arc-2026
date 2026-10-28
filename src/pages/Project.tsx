@@ -1,18 +1,18 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import Layout from '../components/Layout.jsx'
-import Modal from '../components/Modal.jsx'
-import { CATEGORIES, PROJECTS } from '../data/projects.js'
+import Layout from '../components/Layout'
+import Modal from '../components/Modal'
+import { CATEGORIES, PROJECTS, type Category, type Project as ProjectData } from '../data/projects'
 
-function Thumb({ project }) {
+function Thumb({ project }: { project: ProjectData }) {
   if (project.image) return <img src={project.image} alt={project.title} loading="lazy" />
   return <span className="thumb-placeholder">작품 썸네일</span>
 }
 
 export default function Project() {
-  const [category, setCategory] = useState('All')
+  const [category, setCategory] = useState<Category>('All')
   const [active, setActive] = useState(0)
-  const [selected, setSelected] = useState(null)
-  const refs = useRef([])
+  const [selected, setSelected] = useState<ProjectData | null>(null)
+  const refs = useRef<(HTMLLIElement | null)[]>([])
 
   const list = useMemo(
     () => (category === 'All' ? PROJECTS : PROJECTS.filter((p) => p.category === category)),
@@ -65,7 +65,9 @@ export default function Project() {
     >
       <ul className="project-list">
         {list.map((p, i) => (
-          <li key={p.id} ref={(el) => (refs.current[i] = el)} className={i === active ? 'is-active' : ''}>
+          <li key={p.id} ref={(el) => {
+              refs.current[i] = el
+            }} className={i === active ? 'is-active' : ''}>
             <button className="project-card" onClick={() => setSelected(p)}>
               <Thumb project={p} />
               <span className="project-card-title">{p.title}</span>

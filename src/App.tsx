@@ -1,11 +1,11 @@
 import { useEffect } from 'react'
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
-import Intro from './pages/Intro.jsx'
-import Home from './pages/Home.jsx'
-import About from './pages/About.jsx'
-import Project from './pages/Project.jsx'
-import MapPage from './pages/Map.jsx'
-import Behind from './pages/Behind.jsx'
+import Intro from './pages/Intro'
+import Home from './pages/Home'
+import About from './pages/About'
+import Project from './pages/Project'
+import MapPage from './pages/Map'
+import Behind from './pages/Behind'
 
 function ScrollToTop() {
   const { pathname } = useLocation()

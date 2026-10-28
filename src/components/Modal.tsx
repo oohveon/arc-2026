@@ -1,9 +1,17 @@
-import { useEffect } from 'react'
+import { useEffect, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 
-export default function Modal({ title, onClose, children, onPrev, onNext }) {
+interface ModalProps {
+  title: string
+  onClose: () => void
+  children: ReactNode
+  onPrev?: () => void
+  onNext?: () => void
+}
+
+export default function Modal({ title, onClose, children, onPrev, onNext }: ModalProps) {
   useEffect(() => {
-    const onKey = (e) => {
+    const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
       if (e.key === 'ArrowLeft' && onPrev) onPrev()
       if (e.key === 'ArrowRight' && onNext) onNext()

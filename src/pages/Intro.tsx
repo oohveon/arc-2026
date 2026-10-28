@@ -1,7 +1,19 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type RefObject } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Logo } from '../components/Layout.jsx'
-import BODY from '../data/introBody.json'
+import { Logo } from '../components/Layout'
+import bodyJson from '../data/introBody.json'
+
+type RGB = [number, number, number]
+
+// [x, y, 흑백 값, 최종 색(hex), 색이 바뀌기 시작하는 시점, 페이드가 끝나는 시점(0이면 즉시)]
+type BodyCell = [number, number, number, string, number, number]
+interface BodyData {
+  w: number
+  h: number
+  size: number
+  cells: BodyCell[]
+}
+const BODY = bodyJson as unknown as BodyData
 
 // 모션 타이밍은 '웹 인트로 모션그래픽' 영상(5초)에서 측정한 값
 const DURATION = 5
@@ -10,7 +22,7 @@ const AUTO_ENTER_MS = 6500
 const SCALE = ['#fbfee1', '#f5fdb3', '#eefb81', '#e7fa53', '#5ec2cb', '#f99c39', '#fbb86f', '#d65051', '#fa4796', '#f9378d', '#482be4']
 const SCALE_GRAY = ['#ececec', '#dfe0df', '#cecece', '#b5b6b5', '#a6a7a6', '#9c9c9c', '#888888', '#7c7d7c', '#747574', '#636363', '#4a4b4a']
 // 맨 아래 칸부터 0.167초 간격으로 색이 찬다
-const scaleTime = (i) => 0.97 + (SCALE.length - 1 - i) * 0.167
+const scaleTime = (i: number) => 0.97 + (SCALE.length - 1 - i) * 0.167
 const SCALE_LABELS = [
   { label: '38℃', y: 242, cell: 1 },
   { label: '37.5℃', y: 347, cell: 3 },
@@ -18,11 +30,25 @@ const SCALE_LABELS = [
   { label: '(36.5)℃', y: 558, cell: 7 },
   { label: '36℃', y: 664, cell: 9 },
 ]
-const CALLOUTS = [
-  { value: '37.8', start: 0.17, end: 1.17, x: 820, y: 267, w: 66, h: 85, mark: 'cross' },
-  { value: '36.5', start: 0.67, end: 1.75, x: 1032, y: 456, w: 66, h: 40, mark: 'cross' },
-  { value: '35.9', start: 1.17, end: 2.25, x: 857, y: 715, w: 66, h: 60, mark: 'dot' },
-  { value: '34.7', start: 1.5, end: 2.6, x: 509, y: 788, w: 59, h: 60, labelX: 534 },
+interface ScrambleProps {
+  value: string
+  start: number
+  end: number
+}
+interface Callout {
+  label?: ScrambleProps
+  x: number
+  y: number
+  w: number
+  h: number
+  mark?: 'cross' | 'dot'
+  labelX?: number
+}
+const CALLOUTS: Callout[] = [
+  { label: { value: '37.8', start: 0.17, end: 1.17 }, x: 820, y: 267, w: 66, h: 85, mark: 'cross' },
+  { label: { value: '36.5', start: 0.67, end: 1.75 }, x: 1032, y: 456, w: 66, h: 40, mark: 'cross' },
+  { label: { value: '35.9', start: 1.17, end: 2.25 }, x: 857, y: 715, w: 66, h: 60, mark: 'dot' },
+  { label: { value: '34.7', start: 1.5, end: 2.6 }, x: 509, y: 788, w: 59, h: 60, labelX: 534 },
   { x: 592, y: 99, w: 70, h: 74, mark: 'dot' },
 ]
 // 걷는 사람: 박스와 옷 색이 순서대로 나타난다 (좌표는 그룹 기준)
@@ -44,9 +70,9 @@ function useTimeline() {
   const [time, setTime] = useState(() => (prefersReducedMotion() ? DURATION : 0))
   useEffect(() => {
     if (prefersReducedMotion()) return
-    let raf
+    let raf = 0
     const start = performance.now()
-    const tick = (now) => {
+    const tick = (now: number) => {
       const t = (now - start) / 1000
       setTime(t)
       if (t < DURATION + 0.5) raf = requestAnimationFrame(tick)
@@ -57,16 +83,25 @@ function useTimeline() {
   return time
 }
 
-const hexToRgb = (h) => [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)]
-const CELLS = BODY.cells.map(([x, y, gray, color, t, settle]) => ({ x, y, gray, rgb: hexToRgb(color), t, settle }))
+const hexToRgb = (h: string): RGB => [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)]
+interface Cell {
+  x: number
+  y: number
+  gray: number
+  rgb: RGB
+  t: number
+  settle: number
+}
+const CELLS: Cell[] = BODY.cells.map(([x, y, gray, color, t, settle]) => ({ x, y, gray, rgb: hexToRgb(color), t, settle }))
 
 // 흑백 픽셀이 칸마다 다른 시점에 열화상 색으로 물드는 인체
-function ThermalBody({ time }) {
-  const canvasRef = useRef(null)
+function ThermalBody({ time }: { time: number }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
   const [scale, setScale] = useState(0)
 
   useEffect(() => {
     const canvas = canvasRef.current
+    if (!canvas) return
     const ro = new ResizeObserver(([entry]) => setScale(entry.contentRect.width / BODY.w))
     ro.observe(canvas)
     return () => ro.disconnect()
@@ -74,7 +109,7 @@ function ThermalBody({ time }) {
 
   useEffect(() => {
     const canvas = canvasRef.current
-    if (!scale) return
+    if (!canvas || !scale) return
     const dpr = window.devicePixelRatio || 1
     const k = scale * dpr
     const w = Math.round(BODY.w * k)
@@ -84,10 +119,11 @@ function ThermalBody({ time }) {
       canvas.height = h
     }
     const ctx = canvas.getContext('2d')
+    if (!ctx) return
     ctx.clearRect(0, 0, w, h)
     const half = BODY.size / 2
     for (const c of CELLS) {
-      let r, g, b
+      let r: number, g: number, b: number
       if (time < c.t) {
         r = g = b = c.gray
       } else if (!c.settle || time >= c.settle) {
@@ -107,7 +143,7 @@ function ThermalBody({ time }) {
 }
 
 // 숫자가 굴러가다가 최종 값에 멈추는 라벨
-function ScrambleLabel({ value, start, end, time }) {
+function ScrambleLabel({ value, start, end, time }: ScrambleProps & { time: number }) {
   if (time < start) return null
   if (time >= end) return <>{value}℃</>
   const frame = Math.floor(time * 20)
@@ -120,7 +156,7 @@ function ScrambleLabel({ value, start, end, time }) {
 }
 
 // 글자 수만큼만 보이게 하되, 자리를 미리 잡아 줄바꿈이 흔들리지 않게 한다
-function Typed({ text, count }) {
+function Typed({ text, count }: { text: string; count: number }) {
   return (
     <>
       <span>{text.slice(0, count)}</span>
@@ -130,9 +166,9 @@ function Typed({ text, count }) {
 }
 
 // 컬러바 i번째 칸의 대표 온도 (38℃ 눈금이 0|1 칸 경계, 칸당 0.25℃)
-const scaleTemp = (i) => 38 - (i - 0.5) * 0.25
+const scaleTemp = (i: number) => 38 - (i - 0.5) * 0.25
 const SCALE_RGB = SCALE.map((c) => hexToRgb(c.slice(1)))
-const cellTemp = (rgb) => {
+const cellTemp = (rgb: RGB) => {
   let best = 0
   let bestD = Infinity
   SCALE_RGB.forEach((s, i) => {
@@ -148,17 +184,17 @@ const cellTemp = (rgb) => {
 const canHover = () => typeof window !== 'undefined' && window.matchMedia?.('(hover: hover) and (pointer: fine)').matches
 
 // PC에서 커서를 따라다니며 커서 아래 픽셀의 체온을 보여주는 박스
-function CursorProbe({ figureRef }) {
-  const boxRef = useRef(null)
-  const [temp, setTemp] = useState(null)
+function CursorProbe({ figureRef }: { figureRef: RefObject<HTMLDivElement> }) {
+  const boxRef = useRef<HTMLDivElement>(null)
+  const [temp, setTemp] = useState<number | null>(null)
 
   useEffect(() => {
     const target = { x: window.innerWidth / 2, y: window.innerHeight / 2 }
     const pos = { ...target }
-    let raf
-    let lastCell = undefined
+    let raf = 0
+    let lastCell: Cell | null | undefined
 
-    const onMove = (e) => {
+    const onMove = (e: MouseEvent) => {
       target.x = e.clientX
       target.y = e.clientY
       const rect = figureRef.current?.getBoundingClientRect()
@@ -166,7 +202,7 @@ function CursorProbe({ figureRef }) {
       const k = rect.width / BODY.w
       const bx = (e.clientX - rect.left) / k
       const by = (e.clientY - rect.top) / k
-      let hit = null
+      let hit: Cell | null = null
       let hitD = (BODY.size * 0.75) ** 2
       for (const c of CELLS) {
         const d = (c.x - bx) ** 2 + (c.y - by) ** 2
@@ -202,9 +238,9 @@ function CursorProbe({ figureRef }) {
   )
 }
 
-const typedCount = (time, start, perChar, length) => Math.max(0, Math.min(length, Math.floor((time - start) / perChar)))
+const typedCount = (time: number, start: number, perChar: number, length: number) => Math.max(0, Math.min(length, Math.floor((time - start) / perChar)))
 
-function barHeight(base, i, time) {
+function barHeight(base: number, i: number, time: number) {
   if (time >= DURATION) return base
   // 마지막 0.4초 동안 원래 높이로 돌아온다
   const settle = Math.min(1, Math.max(0, (DURATION - time) / 0.4))
@@ -216,7 +252,7 @@ export default function Intro() {
   const navigate = useNavigate()
   const [leaving, setLeaving] = useState(false)
   const [hoverable] = useState(canHover)
-  const figureRef = useRef(null)
+  const figureRef = useRef<HTMLDivElement>(null)
   const time = useTimeline()
 
   const enter = () => {
@@ -269,9 +305,9 @@ export default function Intro() {
 
         {CALLOUTS.map((c, i) => (
           <div key={i} className="intro-callout" style={{ '--x': c.x, '--y': c.y, '--w': c.w, '--h': c.h }}>
-            {c.value && (
+            {c.label && (
               <span className="intro-callout-label" style={{ '--lx': (c.labelX ?? c.x) - c.x }}>
-                <ScrambleLabel {...c} time={time} />
+                <ScrambleLabel {...c.label} time={time} />
               </span>
             )}
             <span className={`intro-callout-box mark-${c.mark ?? 'none'}`} />

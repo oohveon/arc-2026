@@ -1,5 +1,5 @@
-import Layout from '../components/Layout.jsx'
-import { EXHIBITION } from '../data/exhibition.js'
+import Layout from '../components/Layout'
+import { EXHIBITION } from '../data/exhibition'
 
 export default function Home() {
   return (

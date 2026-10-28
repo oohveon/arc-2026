@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react'
-import Layout from '../components/Layout.jsx'
-import Modal from '../components/Modal.jsx'
-import { BEHIND } from '../data/projects.js'
+import Layout from '../components/Layout'
+import Modal from '../components/Modal'
+import { BEHIND } from '../data/projects'
 
 // 카드 좌표(1920 기준)와 번호 위치: 계단식 배치
 const POS = [
@@ -15,10 +15,10 @@ const POS = [
 ]
 
 export default function Behind() {
-  const [index, setIndex] = useState(null)
+  const [index, setIndex] = useState<number | null>(null)
   const close = useCallback(() => setIndex(null), [])
-  const prev = useCallback(() => setIndex((i) => (i - 1 + BEHIND.length) % BEHIND.length), [])
-  const next = useCallback(() => setIndex((i) => (i + 1) % BEHIND.length), [])
+  const prev = useCallback(() => setIndex((i) => (i === null ? i : (i - 1 + BEHIND.length) % BEHIND.length)), [])
+  const next = useCallback(() => setIndex((i) => (i === null ? i : (i + 1) % BEHIND.length)), [])
 
   return (
     <Layout className="page-behind">

@@ -7,14 +7,14 @@ ARC EXHIBITION VOL. 2 웹사이트. Figma `2027 ARC 웹팀 / 웹 디자인` 시�
 ```bash
 npm install
 npm run dev      # 개발 서버
-npm run build    # dist/ 로 빌드
+npm run build    # 타입 검사 후 dist/ 로 빌드
 ```
 
 ## 페이지
 
 | 경로 | 내용 |
 | --- | --- |
-| `/` | Intro (클릭 또는 6초 후 Home으로 이동) |
+| `/` | Intro 모션 (클릭 또는 6.5초 후 Home으로 이동, PC에서 마우스를 움직이면 자동 이동 취소) |
 | `/home` | 메인 |
 | `/about` | Exhibition · Overview · ARC Team |
 | `/project` | 카테고리별 작품 목록 + 상세 모달 |
@@ -23,8 +23,8 @@ npm run build    # dist/ 로 빌드
 
 ## 콘텐츠 수정
 
-- 전시 정보, 팀원: `src/data/exhibition.js` (팀 사진은 `public/assets/team/`)
-- 작품, 지도 목록, Behind 카드: `src/data/projects.js`
+- 전시 정보, 팀원: `src/data/exhibition.ts` (팀 사진은 `public/assets/team/`)
+- 작품, 지도 목록, Behind 카드: `src/data/projects.ts`
   - `image`가 `null`인 작품은 시안의 회색 썸네일 플레이스홀더로 표시됩니다.
 
 ## 레이아웃

@@ -1,12 +1,23 @@
+export interface TeamMember {
+  handle: string
+  /** public/assets/team/{photo}.png */
+  photo: string
+}
+
+export interface TeamGroup {
+  name: string
+  members: TeamMember[]
+}
+
 export const EXHIBITION = {
   title: 'ARC EXHIBITION VOL. 2',
   date: '27.01.28 - 02.02',
   venue: 'Maru Art Center 2F Gallery 5 · 3F Grand Hall',
   address: '35-6, Insadong-gil, Jongno-gu, Seoul',
   instagram: 'arc__project',
-}
+} as const
 
-export const TEAM = [
+export const TEAM: TeamGroup[] = [
   {
     name: 'OPERATIONS',
     members: [

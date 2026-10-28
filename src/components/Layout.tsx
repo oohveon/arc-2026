@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
-import { EXHIBITION } from '../data/exhibition.js'
+import { EXHIBITION } from '../data/exhibition'
 
 const MENU = [
   { to: '/about', label: 'ABOUT' },
@@ -9,7 +9,7 @@ const MENU = [
   { to: '/behind', label: 'BEHIND' },
 ]
 
-export function Logo({ className = '' }) {
+export function Logo({ className = '' }: { className?: string }) {
   return (
     <Link to="/home" className={`logo ${className}`} aria-label="ARC 홈">
       <img src="/assets/logo.svg" alt="ARC" />
@@ -17,8 +17,19 @@ export function Logo({ className = '' }) {
   )
 }
 
-// sub: 현재 메뉴 아래에 펼쳐지는 하위 항목 [{ key, label }]
-function Nav({ sub, subActive, onSub }) {
+export interface SubItem<K extends string = string> {
+  key: K
+  label: string
+}
+
+// sub: 현재 메뉴 아래에 펼쳐지는 하위 항목
+interface NavProps<K extends string = string> {
+  sub?: SubItem<K>[]
+  subActive?: K
+  onSub?: (key: K) => void
+}
+
+function Nav<K extends string>({ sub, subActive, onSub }: NavProps<K>) {
   const { pathname } = useLocation()
   const [open, setOpen] = useState(false)
 
@@ -49,7 +60,7 @@ function Nav({ sub, subActive, onSub }) {
                 <ul className="nav-sub">
                   {sub.map((s) => (
                     <li key={s.key}>
-                      <button className={subActive === s.key ? 'is-active' : ''} onClick={() => onSub(s.key)}>
+                      <button className={subActive === s.key ? 'is-active' : ''} onClick={() => onSub?.(s.key)}>
                         {s.label}
                       </button>
                     </li>
@@ -81,7 +92,18 @@ export function Footer() {
   )
 }
 
-export default function Layout({ children, className = '', footer = true, ...navProps }) {
+interface LayoutProps<K extends string> extends NavProps<K> {
+  children: ReactNode
+  className?: string
+  footer?: boolean
+}
+
+export default function Layout<K extends string = string>({
+  children,
+  className = '',
+  footer = true,
+  ...navProps
+}: LayoutProps<K>) {
   return (
     <div className={`page ${className}`}>
       <Nav {...navProps} />
