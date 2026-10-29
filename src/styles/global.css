@@ -523,9 +523,41 @@ ol {
   line-height: 1.3;
   animation: fade 0.8s 0.2s both;
 }
-.home-question .blank {
+.temp-input {
   display: inline-block;
-  width: calc(var(--u) * 60);
+  width: 2.1em;
+  margin: 0 0.06em;
+  border-bottom: max(1px, calc(var(--u) * 2)) dashed currentColor;
+  color: var(--temp-color);
+  text-align: center;
+  line-height: 1.1;
+  transition: color 0.6s;
+}
+.temp-input.is-mine {
+  border-bottom-style: solid;
+}
+.temp-input button,
+.temp-input input {
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: inherit;
+  cursor: text;
+}
+.temp-input input {
+  outline: none;
+  caret-color: currentColor;
+}
+.temp-input input::placeholder {
+  color: currentColor;
+  opacity: 0.3;
+}
+.temp-input button:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 4px;
 }
 .home-runners {
   left: calc(var(--u) * 805);
@@ -1203,9 +1235,6 @@ ol {
   .home-question {
     width: auto;
     font-size: 26px;
-  }
-  .home-question .blank {
-    width: 28px;
   }
   .home-runners {
     width: 100%;

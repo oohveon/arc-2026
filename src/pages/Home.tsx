@@ -1,14 +1,25 @@
+import { useState } from 'react'
 import HeatHaze from '../components/HeatHaze'
 import Layout from '../components/Layout'
+import TempInput, { tempHeat } from '../components/TempInput'
 import { EXHIBITION } from '../data/exhibition'
 
 export default function Home() {
+  const [temp, setTemp] = useState(36.5)
+
   return (
     <Layout className="page-home" footer={false}>
       <section className="stage home-stage">
-        <HeatHaze className="home-temp" src="/assets/home-temp.png" alt="36.5°C" width={934} height={314} />
+        <HeatHaze
+          className="home-temp"
+          src="/assets/home-temp.png"
+          alt="36.5°C"
+          width={934}
+          height={314}
+          intensity={tempHeat(temp)}
+        />
         <h1 className="home-question">
-          What temperature do you personally live your life (<span className="blank" />
+          If your life had a temperature, what would it be (<TempInput onChange={setTemp} />
           °C)?
         </h1>
         <img
