@@ -19,8 +19,13 @@ export default function Home() {
           intensity={tempHeat(temp)}
         />
         <h1 className="home-question">
-          If your life had a temperature, what would it be (<TempInput onChange={setTemp} />
-          °C)?
+          If your life had a temperature,
+          <br />
+          what would it be?
+          <span className="home-answer">
+            (<TempInput onChange={setTemp} />
+            )°C
+          </span>
         </h1>
         <img
           className="home-runners"
